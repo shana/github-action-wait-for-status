@@ -23,13 +23,15 @@ final class GetStatusChecksFromCommits
     private LoopInterface $loop;
     private LoggerInterface $logger;
     private string $ignoreActions;
+    private string $watchActions;
     private float $checkInterval;
 
-    public function __construct(LoopInterface $loop, LoggerInterface $logger, string $ignoreActions, float $checkInterval)
+    public function __construct(LoopInterface $loop, LoggerInterface $logger, string $ignoreActions, string $watchActions, float $checkInterval)
     {
         $this->loop          = $loop;
         $this->logger        = $logger;
         $this->ignoreActions = $ignoreActions;
+        $this->watchActions  = $watchActions;
         $this->checkInterval = $checkInterval;
     }
 
@@ -43,7 +45,7 @@ final class GetStatusChecksFromCommits
                 return $commit->refresh();
             })->then(function (Commit $commit): PromiseInterface {
                 return all([
-                    'checks' => new Checks($commit, $this->logger, $this->ignoreActions),
+                    'checks' => new Checks($commit, $this->logger, $this->ignoreActions, $this->watchActions),
                     'status' => $commit->status()->then(function (Commit\CombinedStatus $combinedStatus): StatusCheckInterface {
                         return new Status($this->logger, $combinedStatus);
                     }),

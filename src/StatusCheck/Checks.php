@@ -23,14 +23,16 @@ final class Checks implements StatusCheckInterface
     private LoggerInterface $logger;
     /** @var array<int, string> */
     private array $ignoreActions;
+    private array $watchActions;
     private bool $resolved   = FALSE_;
     private bool $successful = FALSE_;
 
-    public function __construct(Commit $commit, LoggerInterface $logger, string $ignoreActions)
+    public function __construct(Commit $commit, LoggerInterface $logger, string $ignoreActions, string $watchActions)
     {
         $this->commit        = $commit;
         $this->logger        = $logger;
         $this->ignoreActions = explode(',', $ignoreActions);
+        $this->watchActions  = explode(',', $watchActions);
     }
 
     public function refresh(): PromiseInterface
@@ -38,6 +40,8 @@ final class Checks implements StatusCheckInterface
         /** @psalm-suppress UndefinedInterfaceMethod */
         return $this->commit->checks()->filter(function (Commit\Check $check): bool {
             return in_array($check->name(), $this->ignoreActions, TRUE_) === FALSE_;
+        })->filter(function (Commit\Check $check): bool {
+            return in_array($check->name(), $this->watchActions, TRUE_) === TRUE_;
         })->toArray()->toPromise()->then(function (array $checks): void {
             $return = FALSE_;
             $this->logger->debug('Iterating over ' . count($checks) . ' check(s)');
