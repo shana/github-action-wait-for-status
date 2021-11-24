@@ -1,1 +1,1 @@
-FROM wyrihaximusgithubactions/wait-for-status:master
+FROM shanagithubactions/wait-for-status:master

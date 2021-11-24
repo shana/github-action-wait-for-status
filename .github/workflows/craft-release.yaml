@@ -1,6 +1,6 @@
 name: Create Release
 env:
-  DOCKER_IMAGE: wyrihaximusgithubactions/wait-for-status
+  DOCKER_IMAGE: shanagithubactions/wait-for-status
   MILESTONE: ${{ github.event.milestone.title }}
 on:
   milestone:
